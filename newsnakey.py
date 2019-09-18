@@ -7,6 +7,7 @@ COLOR_GREEN = (0,255,0)
 COLOR_BLUE = (0,0,255)
 COLOR_RED = (255,0,0)
 COLOR_WHITE = (255,255,255)
+COLOR_PURPLE = (75,0,130)
 BLOCK_SIZE = 18
 GAP_SIZE = 1
 BLOCK_COUNT = 40
@@ -17,6 +18,7 @@ pygame.init()
 clock = pygame.time.Clock()
 game_display = pygame.display.set_mode((BOARD_SIZE, BOARD_SIZE))
 pygame.display.set_caption('SNAKE!')
+
 
 #daniel = pygame.image.load("Daniel-2.png")
 score_font = pygame.font.SysFont('Arial', 26, True)
@@ -32,7 +34,7 @@ class Snake():
     def __init__(self):
         self.is_alive = True
         self.just_ate_apple = False
-        self.just_hit_poisen = False
+        self.just_hit_Poisen = False
         self.speed = BLOCK_SIZE + GAP_SIZE
         self.create_initial_snake()
         self.move_right()
@@ -71,9 +73,6 @@ class Snake():
             self.body.pop()
         self.just_ate_apple = False
 
-        if self.just_hit_poisen == False:
-            self.body.pop()
-            
         if self.has_hit_wall():
             self.is_alive = False
         
@@ -88,11 +87,7 @@ class Snake():
             or head.ycor + head.size > BOARD_SIZE
     def grow(self):
         self.just_ate_apple = True
-    def just_hit_poisen(self):
-        self.just_hit_poisen = True
-        self.is_alive = False
-
-
+    
     def collides_with_itself(self):
         for x in range(1, len(self.body)):
             if is_collision(self.body[0], self.body[x]):
@@ -140,10 +135,10 @@ def handle_events(snake):
 
 class Poisen():
     def __init__(self):
-        self.xcor = 0
-        self.ycor = 0
+        self.xcor = 1
+        self.ycor = 1
         self.size = BLOCK_SIZE
-        self.color = COLOR_BLACK
+        self.color = COLOR_PURPLE
         self.change_location()
     def change_location(self):
         self.xcor = random.randrange(0, BLOCK_COUNT) * (BLOCK_SIZE + GAP_SIZE) + GAP_SIZE
@@ -177,35 +172,36 @@ def handle_events(snake):
             elif event.key == pygame.K_DOWN:
                 if snake.direction != "UP":
                     snake.move_down()
-poisen = Poisen()
+
 snake = Snake()
 apple = Apple()
+Poisen = Poisen()
 score = 0
 
 # Main Game Loop
 while snake.is_alive:
-
     handle_events(snake)
-
     game_display.blit(game_display, (0, 0))
-    game_display.fill(COLOR_WHITE)
+    game_display.fill(COLOR_BLACK)
     
     snake.collides_with_itself()
+    if is_collision(snake.body[0], Poisen):
+        snake.is_alive = false
 
     if is_collision(snake.body[0], apple):
         apple.change_location()
-        poisen.change_location()
+        Poisen.change_location()
         snake.grow()
-        snake.poisen()
         FRAMES_PER_SECOND += 1
-        score += FRAMES_PER_SECOND / 20
-    poisen.show()
+        score += FRAMES_PER_SECOND
     apple.show()
     snake.show()
+    Poisen.show()
     score_text = score_font.render(str(score), False, COLOR_BLUE)
     game_display.blit(score_text, (0,0))
 
     pygame.display.flip()
     clock.tick(FRAMES_PER_SECOND)
+    
 
 pygame.quit()
